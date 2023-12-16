@@ -44,7 +44,7 @@ public class JsonComparator {
 
 
 
-        // return if no differences are found
+        // return if one object is empty
         if (jsonNode1.size() > jsonNode2.size()){
             return jsonNode1;
         }else{
