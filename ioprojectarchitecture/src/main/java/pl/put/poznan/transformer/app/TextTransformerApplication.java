@@ -13,7 +13,7 @@ public class TextTransformerApplication {
         SpringApplication.run(TextTransformerApplication.class, args);
 
         // compare jsons from path
-        CompareJsons("src/main/resources/changed.json", "src/main/resources/full.json");
+        CompareJsons("ioprojectarchitecture/src/main/resources/changed.json", "ioprojectarchitecture/src/main/resources/full.json");
     }
 
     private static void CompareJsons(String jsonFilePath1, String jsonFilePath2){
