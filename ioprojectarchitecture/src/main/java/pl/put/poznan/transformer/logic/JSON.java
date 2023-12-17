@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,12 +16,14 @@ public class JSON {
         ObjectMapper  objectMapper = new ObjectMapper();
         try {
             node = objectMapper.readValue(jsonString, JsonNode.class);
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public JsonNode get() {return node;}
+    public JsonNode get() {
+            return node;
+    }
 
     public String getString() throws JsonProcessingException {
         ObjectMapper  objectMapper = new ObjectMapper();
