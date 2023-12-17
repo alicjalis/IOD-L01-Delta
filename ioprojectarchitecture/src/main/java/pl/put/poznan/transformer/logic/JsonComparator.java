@@ -12,7 +12,7 @@ public class JsonComparator {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static void compareAndDisplayDifferences(String jsonFilePath1, String jsonFilePath2) {
+    public String compareAndDisplayDifferences(String jsonFilePath1, String jsonFilePath2) {
         try {
             JsonNode jsonNode1 = objectMapper.readTree(new File(jsonFilePath1));
             JsonNode jsonNode2 = objectMapper.readTree(new File(jsonFilePath2));
@@ -23,9 +23,11 @@ public class JsonComparator {
             // print differences
             System.out.println("Differences between " + jsonFilePath1 + " and " + jsonFilePath2 + ":");
             System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(differences));
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(differences);
 
         } catch (IOException e) {
             e.printStackTrace();
+            return "Error";
         }
     }
 

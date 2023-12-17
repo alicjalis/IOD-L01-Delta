@@ -5,47 +5,43 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class FilterDecorator {
+public class Filter {
 
-    public FilterDecorator()  {
-        //decorate(text,filterParameter);
-    }
 
-    public String decorate(String text, String filterParameter) throws JsonProcessingException {
+
+    public String decorate(String text, String[] filterParameter) throws JsonProcessingException {
         JSON jsNode = new JSON(text);
 
-        List<JsonNode> toBeRemoved = new ArrayList<>();
-        filterNodeRecursive(jsNode.get(),filterParameter, toBeRemoved);
-        for(int i=0;i<toBeRemoved.size();i++) {
-            ((ObjectNode)toBeRemoved.get(i)).remove(filterParameter);
+        ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();
+        ArrayList<String> toBeRemovedFieldName = new ArrayList<>();
+        filterNodeRecursive(jsNode.get(),filterParameter, toBeRemovedField, toBeRemovedFieldName);
+        for(int i =0;i<toBeRemovedField.size();i++) {
+            ((ObjectNode) toBeRemovedField.get(i)).remove(toBeRemovedFieldName.get(i));
         }
 
 
         return jsNode.getString();
     }
 
-    private void filterNodeRecursive(JsonNode jsonNode, String filter, List<JsonNode> forRemoval) {
+    private void filterNodeRecursive(JsonNode jsonNode, String[] filter, List<JsonNode> forRemoval, ArrayList<String> forRemovalName) {
 
         if (jsonNode.isObject()) {
             Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
             fields.forEachRemaining(field -> {
 
-                if(field.getKey().equals(filter)) {
+                if(Arrays.asList(filter).contains(field.getKey())) {
                     forRemoval.add(jsonNode);
-
+                    forRemovalName.add(field.getKey());
                 } else {
-                    filterNodeRecursive((JsonNode) field.getValue(), filter,forRemoval);
+                    filterNodeRecursive((JsonNode) field.getValue(), filter,forRemoval, forRemovalName);
                 }
             });
         } else if (jsonNode.isArray()) {
             ArrayNode arrayField = (ArrayNode) jsonNode;
             arrayField.forEach(node -> {
-                filterNodeRecursive(node, filter,forRemoval);
+                filterNodeRecursive(node, filter,forRemoval, forRemovalName);
             });
         }
     }
