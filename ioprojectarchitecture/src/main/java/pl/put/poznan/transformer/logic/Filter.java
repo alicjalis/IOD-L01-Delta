@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilterDecorator {
+public class Filter {
 
-    public FilterDecorator()  {
+    public Filter()  {
         //decorate(text,filterParameter);
     }
 
