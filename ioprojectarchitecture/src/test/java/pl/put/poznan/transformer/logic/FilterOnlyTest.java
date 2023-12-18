@@ -49,6 +49,7 @@ class FilterOnlyTest {
         FilterOnly filter = new FilterOnly(transformer, parameters);
         assertEquals("{\"school_name\":\"Dunder Miflin\",\"students\":[{\"name\":\"Jim\"},{\"name\":\"Dwight\"},{\"name\":\"Kevin\"}]}",
                 filter.decorate(testJSON));
+
     }
 
 }
