@@ -7,11 +7,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
-public class Filter {
+public class Filter extends JsonDecorator  {
+    private final String[] filterParameters;
+    public Filter(JSONTransformer json, String[] parameters) {
+        super(json);
+        filterParameters = parameters;
+    }
+
+    public String decorate(String text)  {
+        return filterString(super.decorate(text),filterParameters);
+    }
 
 
-
-    public String decorate(String text, String[] filterParameter) throws JsonProcessingException {
+    private String filterString(String text, String[] filterParameter)  {
         JSON jsNode = new JSON(text);
 
         ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();
@@ -22,7 +30,11 @@ public class Filter {
         }
 
 
-        return jsNode.getString();
+        try {
+            return jsNode.getString();
+        } catch (JsonProcessingException e) {
+            return "Failure during filtering process";
+        }
     }
 
     private void filterNodeRecursive(JsonNode jsonNode, String[] filter, List<JsonNode> forRemoval, ArrayList<String> forRemovalName) {

@@ -7,13 +7,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
-public class FilterOnly {
-
-    public FilterOnly()  {
-        //decorate(text,filterParameter);
+public class FilterOnly extends JsonDecorator {
+    private final String[] filterParameters;
+    public FilterOnly(JSONTransformer json, String[] filterParameter)  {
+        super(json);
+        filterParameters = filterParameter;
     }
 
-    public String decorate(String text, String[] filterParameter) throws JsonProcessingException {
+    public String decorate(String text) {
+        return filterOutString(super.decorate(text),filterParameters);
+    }
+
+
+    private String filterOutString(String text, String[] filterParameter) {
         JSON jsNode = new JSON(text);
 
         ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();
@@ -24,10 +30,14 @@ public class FilterOnly {
         }
 
 
-        return jsNode.getString();
+        try {
+            return jsNode.getString();
+        } catch (JsonProcessingException e) {
+            return "Failure during filtering proccess";
+        }
     }
 
-    private int filterNodeRecursive(JsonNode jsonNode, String filter[], List<JsonNode>  forRemoval, ArrayList<String> forRemovalName) {
+    private int filterNodeRecursive(JsonNode jsonNode, String[] filter, List<JsonNode>  forRemoval, ArrayList<String> forRemovalName) {
         int numberOfFilterNodesAbove = 0;
         int numberOfFilterNodesCurrent = 0;
         if (jsonNode.isObject()) {
@@ -49,7 +59,7 @@ public class FilterOnly {
             ArrayNode arrayField = (ArrayNode) jsonNode;
             for(int i=0; i < arrayField.size(); i++) {
                 numberOfFilterNodesAbove = filterNodeRecursive(arrayField.get(i), filter,forRemoval, forRemovalName);
-            };
+            }
 
         }
         return numberOfFilterNodesCurrent + numberOfFilterNodesAbove;
