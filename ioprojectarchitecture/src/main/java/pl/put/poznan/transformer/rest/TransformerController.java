@@ -1,35 +1,74 @@
 package pl.put.poznan.transformer.rest;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
-import pl.put.poznan.transformer.logic.JsonComparator;
-import pl.put.poznan.transformer.logic.Filter;
-import pl.put.poznan.transformer.logic.FilterOnly;
+import pl.put.poznan.transformer.logic.*;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @RestController
 @RequestMapping("/transformer")
 public class TransformerController {
 
     private final JsonComparator jsonComparator;
-    private final Filter filter;
-    private final FilterOnly filterOnly;
+    private final JsonDecoratorBuilder builder;
 
-    public TransformerController(JsonComparator jsonComparator, Filter filter, FilterOnly filterOnly) {
-        this.jsonComparator = jsonComparator;
-        this.filter = filter;
-        this.filterOnly = filterOnly;
+    private final Map<String, JSON> jsonRepository = new HashMap<>();
+
+
+
+    public TransformerController() {
+        this.jsonComparator = new JsonComparator();
+        this.builder = new JsonDecoratorBuilder();
     }
 
-    @PostMapping("/compare")
-    public String compare(@RequestBody String json1, @RequestBody String json2) {
-        return jsonComparator.compareAndDisplayDifferences(json1, json2);
+    @PostMapping("/compare/")
+    public String compare(@RequestBody String body) {
+        return jsonComparator.compareAndDisplayDifferences(body, body);
     }
 
-    @PostMapping("/filter")
-    public String filter(@RequestBody String text, @RequestParam(value="filterParameter", defaultValue="") String filterParameter) throws JsonProcessingException {
-        return filter.decorate(text, filterParameter);
+    @PostMapping("/")
+    public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
+                         @RequestParam(value="filter", defaultValue="") String[] filterParameter,
+                         @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter)  {
+
+        JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
+        return transform.decorate(text);
     }
 
-    @PostMapping("/filterOnly")
-    public String filterOnly(@RequestBody String text, @RequestParam(value="transforms", defaultValue="upper,escape") String[] transforms) {
-        return filterOnly.filterOnly(text, transforms);
+//    @PostMapping("/filterOnly")
+//    public String filterOnly(@RequestBody String text, @RequestParam(value="filterParameter", defaultValue="") String[] filterParameter) throws JsonProcessingException {
+//        //return filterOnly.decorate(text, filterParameter);
+//
+//    }
+
+    @PostMapping("/json")
+    public String createJSON(@RequestBody String jsonString) {
+        JSON json = new JSON(jsonString);
+        String id = UUID.randomUUID().toString();
+        jsonRepository.put(id, json);
+        return id;
     }
+
+    @GetMapping("/json/{id}")
+    public String getJSON(@PathVariable String id) {
+        JSON json = jsonRepository.get(id);
+        if (json == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "JSON with id " + id + " not found");
+        }
+        try {
+            return json.getString();
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON", e);
+        }
+    }
+
+
+
+
 }
