@@ -16,9 +16,9 @@ public class JsonDecoratorBuilder {
         }
 
         if(format.equals("minify")) {
-            //transformer = new MinifyDecorator(transformer);
+            transformer = new MinifyDecorator(transformer);
         } else if (format.equals("prettify")) {
-            //transformer = new Prettify(transformer);
+            transformer = new PrettifyDecorator(transformer);
         }
 
         return transformer;

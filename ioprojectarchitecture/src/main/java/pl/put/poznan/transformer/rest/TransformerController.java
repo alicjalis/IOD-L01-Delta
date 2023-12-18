@@ -35,7 +35,7 @@ public class TransformerController {
     @PostMapping("/")
     public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
                          @RequestParam(value="filter", defaultValue="") String[] filterParameter,
-                         @RequestParam(value="filterOut", defaultValue="") String[] filterOnlyParameter)  {
+                         @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter)  {
 
         JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
         return transform.decorate(text);
