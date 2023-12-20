@@ -49,11 +49,11 @@ public class TransformerController {
     /**
      * Filtruje plik JSON na podstawie podanych parametrów.
      *
-     * @param text tekst JSON do filtrowania
-     * @param format format filtrowania
-     * @param filterParameter parametry filtrowania
-     * @param filterOnlyParameter parametry filtrowania
-     * @return JSON po filtrowaniu
+     * @param text JSON w foramcie tekstu do przekształcenia
+     * @param format format jsona wynikowaego: minify - json zminifikowany, prettify - json czytelny
+     * @param filterParameter opcjonalna lista własności do odfiltrowania z jsona
+     * @param filterOnlyParameter opcjonalna lista jedynych własności do pozostawienia
+     * @return JSON po przekształceniach
      */
     @PostMapping("/")
     public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
