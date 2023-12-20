@@ -39,7 +39,7 @@ public class TransformerController {
      * Porównuje dwa JSONy i zwraca różnice.
      *
      * @param body JSON do porównania
-     * @return różnice między dwoma JSON-ami
+     * @return różnice między dwoma JSONami
      */
     @PostMapping("/compare/")
     public String compare(@RequestBody String body) {
@@ -68,7 +68,7 @@ public class TransformerController {
      * Tworzy nowego JSONa i zapisuje go do repozytorium.
      *
      * @param jsonString JSON do zapisania
-     * @return identyfikator zapisanego JSON-a
+     * @return identyfikator zapisanego JSONa
      */
     @PostMapping("/json")
     public String createJSON(@RequestBody String jsonString) {
