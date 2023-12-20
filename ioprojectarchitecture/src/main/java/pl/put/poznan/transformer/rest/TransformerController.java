@@ -23,7 +23,7 @@ public class TransformerController {
     private final JsonDecoratorBuilder builder;
 
     /**
-     * Repozytorium do przechowywania JSON-ów.
+     * Repozytorium do przechowywania JSONów.
      */
     private final Map<String, JSON> jsonRepository = new HashMap<>();
 
