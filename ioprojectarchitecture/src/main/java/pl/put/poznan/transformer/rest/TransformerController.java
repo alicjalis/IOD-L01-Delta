@@ -47,7 +47,7 @@ public class TransformerController {
     }
 
     /**
-     * Filtruje JSON na podstawie podanych parametrów.
+     * Filtruje plik JSON na podstawie podanych parametrów.
      *
      * @param text tekst JSON do filtrowania
      * @param format format filtrowania
@@ -79,7 +79,7 @@ public class TransformerController {
     }
 
     /**
-     * Pobiera JSON z repozytorium na podstawie podanego identyfikatora.
+     * Pobiera plik JSON z repozytorium na podstawie podanego identyfikatora.
      *
      * @param id identyfikator JSONa do pobrania
      * @return JSON po pobraniu
