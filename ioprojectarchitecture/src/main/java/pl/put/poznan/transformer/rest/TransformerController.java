@@ -10,7 +10,11 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-
+/**
+ * TransformerController jest odpowiedzialny za obsługę żądań HTTP do formatowania plików JSON.
+ *
+ * @author Alicja Lis, Józef Godlewski
+ */
 @RestController
 @RequestMapping("/transformer")
 public class TransformerController {
@@ -18,35 +22,54 @@ public class TransformerController {
     private final JsonComparator jsonComparator;
     private final JsonDecoratorBuilder builder;
 
+    /**
+     * Repozytorium do przechowywania JSON-ów.
+     */
     private final Map<String, JSON> jsonRepository = new HashMap<>();
 
-
-
+    /**
+     * Konstruktor klasy TransformerController.
+     */
     public TransformerController() {
         this.jsonComparator = new JsonComparator();
         this.builder = new JsonDecoratorBuilder();
     }
 
+    /**
+     * Porównuje dwa JSONy i zwraca różnice.
+     *
+     * @param body JSON do porównania
+     * @return różnice między dwoma JSON-ami
+     */
     @PostMapping("/compare/")
     public String compare(@RequestBody String body) {
         return jsonComparator.compareAndDisplayDifferences(body, body);
     }
 
+    /**
+     * Filtruje JSON na podstawie podanych parametrów.
+     *
+     * @param text tekst JSON do filtrowania
+     * @param format format filtrowania
+     * @param filterParameter parametry filtrowania
+     * @param filterOnlyParameter parametry filtrowania
+     * @return JSON po filtrowaniu
+     */
     @PostMapping("/")
     public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
                          @RequestParam(value="filter", defaultValue="") String[] filterParameter,
-                         @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter)  {
+                         @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter) {
 
         JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
         return transform.decorate(text);
     }
 
-//    @PostMapping("/filterOnly")
-//    public String filterOnly(@RequestBody String text, @RequestParam(value="filterParameter", defaultValue="") String[] filterParameter) throws JsonProcessingException {
-//        //return filterOnly.decorate(text, filterParameter);
-//
-//    }
-
+    /**
+     * Tworzy nowego JSONa i zapisuje go do repozytorium.
+     *
+     * @param jsonString JSON do zapisania
+     * @return identyfikator zapisanego JSON-a
+     */
     @PostMapping("/json")
     public String createJSON(@RequestBody String jsonString) {
         JSON json = new JSON(jsonString);
@@ -55,6 +78,12 @@ public class TransformerController {
         return id;
     }
 
+    /**
+     * Pobiera JSON z repozytorium na podstawie podanego identyfikatora.
+     *
+     * @param id identyfikator JSONa do pobrania
+     * @return JSON po pobraniu
+     */
     @GetMapping("/json/{id}")
     public String getJSON(@PathVariable String id) {
         JSON json = jsonRepository.get(id);
@@ -67,8 +96,4 @@ public class TransformerController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON", e);
         }
     }
-
-
-
-
 }
