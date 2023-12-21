@@ -70,7 +70,6 @@ public class Filter extends JsonDecorator  {
      * @param filter  Parametry filtrowania.
      * @param forRemoval Węzły do usunięcia.
      * @param forRemovalName Nazwy węzłów do usunięcia.
-     * @return Zwraca liczbę węzłów, które spełniają warunki filtrowania.
      */
     private void filterNodeRecursive(JsonNode jsonNode, String[] filter, List<JsonNode> forRemoval, ArrayList<String> forRemovalName) {
 
