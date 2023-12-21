@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
 
 /**
- * Klasa FilterOnly służy do filtrowania pól JSON.
+ * Klasa FilterOnly służy do filtrowania pól JSON, usuwając wszystkie pola
  * Zawiera metody do filtrowania tekstu.
  */
 public class FilterOnly extends JsonDecorator {
@@ -18,7 +18,7 @@ public class FilterOnly extends JsonDecorator {
      * Konstruktor klasy FilterOnly.
      *
      * @param json           Obiekt klasy JSONTransformer.
-     * @param filterParameter Tablica parametrów filtrowania.
+     * @param filterParameter Tablica kluczy filtrowania, do pozostawienia w jsonie.
      */
     public FilterOnly(JSONTransformer json, String[] filterParameter) {
         super(json);
@@ -26,28 +26,27 @@ public class FilterOnly extends JsonDecorator {
     }
 
     /**
-     * Metoda DO UZUPELNIENIA
+     * Dekorator do filtrowania jsona
      *
-     * @param text
-     * @return Zwraca zmieniony tekst
+     * @param text json do filtrowania
+     * @return Zwraca json z polami z tylko podanymi kluczami
      */
     public String decorate(String text) {
-        return filterOutString(super.decorate(text),filterParameters);
+        return filterOutString(super.decorate(text));
     }
 
     /**
      * Metoda filtrująca tekst.
      *
      * @param text Tekst do filtrowania.
-     * @param filterParameter Parametry filtrowania.
      * @return Zwraca przefiltrowany tekst.
      */
-    private String filterOutString(String text, String[] filterParameter) {
+    private String filterOutString(String text) {
         JSON jsNode = new JSON(text);
 
         ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();
         ArrayList<String> toBeRemovedFieldName = new ArrayList<>();
-        filterNodeRecursive(jsNode.get(),filterParameter, toBeRemovedField, toBeRemovedFieldName);
+        filterNodeRecursive(jsNode.get(),filterParameters, toBeRemovedField, toBeRemovedFieldName);
         for(int i =0;i<toBeRemovedField.size();i++) {
             ((ObjectNode) toBeRemovedField.get(i)).remove(toBeRemovedFieldName.get(i));
         }

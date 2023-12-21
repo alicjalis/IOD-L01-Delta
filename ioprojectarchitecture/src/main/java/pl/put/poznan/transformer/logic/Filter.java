@@ -7,24 +7,49 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.*;
 
+
+
+/**
+ * Dekorator do filtrowania kluczy z jsona
+ * Zawiera metody do filtrowania tekstu.
+ */
 public class Filter extends JsonDecorator  {
     private final String[] filterParameters;
+
+    /**
+     * Konstruktor klasy Filter
+     *
+     * @param json Obiekt klasy JSONTransformer.
+     * @param parameters Tablica kluczy do odfiltrowania z jsona.
+     */
     public Filter(JSONTransformer json, String[] parameters) {
         super(json);
         filterParameters = parameters;
     }
 
+    /**
+     * Dekorator do filtrowania jsona
+     *
+     * @param text json do filtrowania
+     * @return Zwraca json bez pól z podanych kluczy
+     */
     public String decorate(String text)  {
-        return filterString(super.decorate(text),filterParameters);
+        return filterString(super.decorate(text));
     }
 
 
-    private String filterString(String text, String[] filterParameter)  {
+    /**
+     * Metoda filtrująca tekst.
+     *
+     * @param text Tekst do filtrowania.
+     * @return Zwraca przefiltrowany tekst.
+     */
+    private String filterString(String text)  {
         JSON jsNode = new JSON(text);
 
         ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();
         ArrayList<String> toBeRemovedFieldName = new ArrayList<>();
-        filterNodeRecursive(jsNode.get(),filterParameter, toBeRemovedField, toBeRemovedFieldName);
+        filterNodeRecursive(jsNode.get(),filterParameters, toBeRemovedField, toBeRemovedFieldName);
         for(int i =0;i<toBeRemovedField.size();i++) {
             ((ObjectNode) toBeRemovedField.get(i)).remove(toBeRemovedFieldName.get(i));
         }
@@ -37,6 +62,16 @@ public class Filter extends JsonDecorator  {
         }
     }
 
+
+    /**
+     * Metoda rekurencyjnie filtrująca plik JSON.
+     *
+     * @param jsonNode Węzeł JSON do filtrowania.
+     * @param filter  Parametry filtrowania.
+     * @param forRemoval Węzły do usunięcia.
+     * @param forRemovalName Nazwy węzłów do usunięcia.
+     * @return Zwraca liczbę węzłów, które spełniają warunki filtrowania.
+     */
     private void filterNodeRecursive(JsonNode jsonNode, String[] filter, List<JsonNode> forRemoval, ArrayList<String> forRemovalName) {
 
         if (jsonNode.isObject()) {
