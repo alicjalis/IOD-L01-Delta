@@ -3,6 +3,8 @@ package pl.put.poznan.transformer.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.web.bind.annotation.*;
 import pl.put.poznan.transformer.logic.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -18,8 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/transformer")
 public class TransformerController {
-
-    private final JsonComparator jsonComparator;
     private final JsonDecoratorBuilder builder;
 
     /**
@@ -28,22 +28,37 @@ public class TransformerController {
     private final Map<String, JSON> jsonRepository = new HashMap<>();
 
     /**
+     * Przy użyciu obiektu logger zapisywane są informacje dotyczące zapytań oraz wystąpionych błędów
+     */
+    private static final Logger logger = LoggerFactory.getLogger(TransformerController.class);
+
+    /**
      * Konstruktor klasy TransformerController.
      */
     public TransformerController() {
-        this.jsonComparator = new JsonComparator();
         this.builder = new JsonDecoratorBuilder();
     }
 
+
     /**
-     * Porównuje dwa JSONy i zwraca różnice.
+     * Wrapper do rozpakowania jsonow do porównania w funkcji compare
+     */
+    public class RequestWrapper {
+        public String json1;
+        public String json2;
+    }
+
+    /**
+     * Porównuje dwa JSONy i zwraca różnice pomiędzy nimi.
      *
-     * @param body JSON do porównania
+     * @param requestBody JSONy do porównania zapakowane w strukture RequestWrapper
      * @return różnice między dwoma JSONami
      */
     @PostMapping("/compare/")
-    public String compare(@RequestBody String body) {
-        return jsonComparator.compareAndDisplayDifferences(body, body);
+    public String compare(@RequestBody RequestWrapper requestBody) {
+        logger.info("Compare POST - json: "+requestBody);
+        JSONTransformer transform = new JsonComparator(new JsonDecorator( new BasicJsonTransformer()),requestBody.json1);
+        return transform.decorate(requestBody.json2);
     }
 
     /**
@@ -59,6 +74,7 @@ public class TransformerController {
     public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
                          @RequestParam(value="filter", defaultValue="") String[] filterParameter,
                          @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter) {
+        logger.info("Filter POST - json: "+text);
 
         JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
         return transform.decorate(text);
@@ -72,6 +88,7 @@ public class TransformerController {
      */
     @PostMapping("/json")
     public String createJSON(@RequestBody String jsonString) {
+        logger.info("Create json POST - json: "+jsonString);
         JSON json = new JSON(jsonString);
         String id = UUID.randomUUID().toString();
         jsonRepository.put(id, json);
@@ -86,6 +103,7 @@ public class TransformerController {
      */
     @GetMapping("/json/{id}")
     public String getJSON(@PathVariable String id) {
+        logger.info("GET json, id - : "+id);
         JSON json = jsonRepository.get(id);
         if (json == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "JSON with id " + id + " not found");

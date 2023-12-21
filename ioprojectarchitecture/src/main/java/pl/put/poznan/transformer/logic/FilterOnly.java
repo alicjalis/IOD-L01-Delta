@@ -36,10 +36,10 @@ public class FilterOnly extends JsonDecorator {
     }
 
     /**
-     * Metoda filtrująca tekst.
+     * Metoda filtrująca jsona
      *
-     * @param text Tekst do filtrowania.
-     * @return Zwraca przefiltrowany tekst.
+     * @param text Json do filtrowania.
+     * @return Zwraca przefiltrowany Json.
      */
     private String filterOutString(String text) {
         JSON jsNode = new JSON(text);
