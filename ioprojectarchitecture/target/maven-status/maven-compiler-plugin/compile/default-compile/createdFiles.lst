@@ -1,5 +1,6 @@
 pl\put\poznan\transformer\logic\BasicJsonTransformer.class
 pl\put\poznan\transformer\logic\JsonComparator.class
+pl\put\poznan\transformer\rest\TransformerController$RequestWrapper.class
 pl\put\poznan\transformer\logic\JSON.class
 pl\put\poznan\transformer\logic\JSONTransformer.class
 pl\put\poznan\transformer\rest\TransformerController.class
