@@ -10,11 +10,11 @@ public class JsonDecoratorBuilder {
 
     /**
      * Metoda tworząca i zwracająca obiekt implementujący interfejs JSONTransformer.
-     * Na podstawie podanych parametrów dodaje do obiektu różne dekoratory.
+     * Na podstawie podanych parametrów opakowuje transformer w odpowiednie dekoratory.
      *
      * @param format Format, w którym ma być zwrócony ciąg JSON. Może to być "minify" lub "prettify".
-     * @param filterParameter Tablica zawierająca parametry, które mają być filtrowane.
-     * @param filterOnlyParameter Tablica zawierająca parametry, które mają być filtrowane NIE WIEM CO Z NIMI
+     * @param filterParameter Tablica zawierająca opcjonelne parametry, które mają być odfiltrowane z json.
+     * @param filterOnlyParameter Tablica zawierająca opcjonelne parametry do pozostawienia w json(odfiltorowania pozostałych)
      * @return Zwraca obiekt implementujący interfejs JSONTransformer.
      */
     public JSONTransformer getDecorator(String format, String[] filterParameter,String[] filterOnlyParameter) {

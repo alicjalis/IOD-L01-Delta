@@ -56,7 +56,7 @@ public class TransformerController {
      */
     @PostMapping("/compare/")
     public String compare(@RequestBody RequestWrapper requestBody) {
-        logger.info("Compare POST - json: "+requestBody);
+        logger.debug("Compare POST - json: "+requestBody);
         JSONTransformer transform = new JsonComparator(new JsonDecorator( new BasicJsonTransformer()),requestBody.json1);
         return transform.decorate(requestBody.json2);
     }
@@ -74,10 +74,35 @@ public class TransformerController {
     public String filter(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
                          @RequestParam(value="filter", defaultValue="") String[] filterParameter,
                          @RequestParam(value="filterOnly", defaultValue="") String[] filterOnlyParameter) {
-        logger.info("Filter POST - json: "+text);
+        logger.debug("Filter POST - json: "+text);
 
         JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
         return transform.decorate(text);
+    }
+
+
+    /**
+     * Dodawanie nowego pola do JSON. Pole może być nowe lub napisywać wartość poprzedniego.
+     * Aby wstawiać pola jak pod element można wykorzystać składnię \ (np. master\detail)
+     *
+     * @param text JSON w foramcie tekstu do przekształcenia
+     * @param format format jsona wynikowaego: minify - json zminifikowany, prettify - json czytelny
+     * @param field nazwa pola wsawianego lub ścieżka\nazwa
+     * @param value wartość wstawianego pola
+     * @return JSON po przekształceniach
+     */
+    @PostMapping("/insert")
+    public String insert(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
+                         @RequestParam(value="field", defaultValue="") String field,
+                         @RequestParam(value="value", defaultValue="") String value) {
+        logger.debug("Insert POST - json: "+text);
+
+        JSONTransformer transformer = new JsonDecorator( new BasicJsonTransformer());
+        FieldInserter inserter = new FieldInserter(transformer, field,value);
+        if(format.equals("prettify")) {
+            return new PrettifyDecorator(inserter).decorate(text);
+        }
+        return inserter.decorate(text);
     }
 
     /**
@@ -88,7 +113,7 @@ public class TransformerController {
      */
     @PostMapping("/json")
     public String createJSON(@RequestBody String jsonString) {
-        logger.info("Create json POST - json: "+jsonString);
+        logger.debug("Create json POST - json: "+jsonString);
         JSON json = new JSON(jsonString);
         String id = UUID.randomUUID().toString();
         jsonRepository.put(id, json);
@@ -103,7 +128,7 @@ public class TransformerController {
      */
     @GetMapping("/json/{id}")
     public String getJSON(@PathVariable String id) {
-        logger.info("GET json, id - : "+id);
+        logger.debug("GET json, id - : "+id);
         JSON json = jsonRepository.get(id);
         if (json == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "JSON with id " + id + " not found");
