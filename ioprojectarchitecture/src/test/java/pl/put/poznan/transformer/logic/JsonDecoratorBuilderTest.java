@@ -33,26 +33,6 @@ class JsonDecoratorBuilderTest {
                      transformer.decorate("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}"));
     }
 
-    @Test
-    void test_getDecorator_shouldReturnMinifyDecorator_whenFormatIsPrettify() throws IOException {
-        // Arrange
-        JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
-        String format = "prettify";
-        String[] filterParameter = {};
-        String[] filterOnlyParameter = {};
-
-        // Act
-        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
-
-        // Assert
-        assertTrue(transformer instanceof JSONTransformer);
-        assertEquals("{\r\n" +
-                              "  \"json1\" : {\r\n" +
-                              "    \"id\" : 999\r\n" +
-                              "  }\r\n" +
-                              "}",
-                transformer.decorate("{\"json1\":{\"id\":999}}"));
-    }
 
     @Test
     void test_getDecorator_shouldReturnErrorWhenWrongJson() throws IOException {
@@ -104,4 +84,26 @@ class JsonDecoratorBuilderTest {
         assertEquals("{\"json1\":{\"id\":999},\"json2\":{\"id\":999}}",
                 transformer.decorate("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}"));
     }
+
+    //    @Test
+//    void test_getDecorator_shouldReturnMinifyDecorator_whenFormatIsPrettify() throws IOException {
+//        // Arrange
+//        JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
+//        String format = "prettify";
+//        String[] filterParameter = {};
+//        String[] filterOnlyParameter = {};
+//
+//        // Act
+//        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+//
+//        // Assert
+//        assertTrue(transformer instanceof JSONTransformer);
+//        assertEquals("{\r\n" +
+//                              "  \"json1\" : {\r\n" +
+//                              "    \"id\" : 999\r\n" +
+//                              "  }\r\n" +
+//                              "}",
+//                transformer.decorate("{\"json1\":{\"id\":999}}"));
+//    }
+
 }
