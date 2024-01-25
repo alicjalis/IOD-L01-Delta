@@ -18,23 +18,28 @@ public class JsonDecoratorBuilder {
      * @return Zwraca obiekt implementujący interfejs JSONTransformer.
      */
     public JSONTransformer getDecorator(String format, String[] filterParameter,String[] filterOnlyParameter) {
-        JSONTransformer transformer = new JsonDecorator( new BasicJsonTransformer());
+        try {
+            JSONTransformer transformer = new JsonDecorator(new BasicJsonTransformer());
 
-        if(filterParameter.length != 0) {
-            transformer = new Filter(transformer,filterParameter);
+            if (filterParameter.length != 0) {
+                transformer = new Filter(transformer, filterParameter);
+            }
+
+            if (filterOnlyParameter.length != 0) {
+                transformer = new FilterOnly(transformer, filterOnlyParameter);
+            }
+
+            if (format.equals("minify")) {
+                transformer = new MinifyDecorator(transformer);
+            } else if (format.equals("prettify")) {
+                transformer = new PrettifyDecorator(transformer);
+            }
+
+            return transformer;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        if(filterOnlyParameter.length != 0) {
-            transformer = new FilterOnly(transformer,filterOnlyParameter);
-        }
-
-        if(format.equals("minify")) {
-            transformer = new MinifyDecorator(transformer);
-        } else if (format.equals("prettify")) {
-            transformer = new PrettifyDecorator(transformer);
-        }
-
-        return transformer;
     }
 }
 

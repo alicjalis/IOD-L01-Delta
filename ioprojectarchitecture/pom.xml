@@ -64,16 +64,31 @@
                         </goals>
                         <configuration>
                             <classifier>spring-boot</classifier>
-                            <mainClass>
-                                com.baeldung.executable.ExecutableMavenJar
-                            </mainClass>
+                            <mainClass> com.baeldung.executable.ExecutableMavenJar </mainClass>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                    <reportOutputDirectory>${project.basedir}</reportOutputDirectory>
+                    <destDir>target/docs</destDir>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

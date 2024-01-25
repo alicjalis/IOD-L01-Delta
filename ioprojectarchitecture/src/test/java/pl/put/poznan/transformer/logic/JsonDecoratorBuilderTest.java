@@ -1,3 +1,5 @@
+package pl.put.poznan.transformer.logic;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -9,25 +11,13 @@ import pl.put.poznan.transformer.logic.PrettifyDecorator;
 import pl.put.poznan.transformer.logic.Filter;
 import pl.put.poznan.transformer.logic.FilterOnly;
 
+import java.io.IOException;
+
 class JsonDecoratorBuilderTest {
 
-    @Test
-    void getDecorator_shouldReturnBasicJsonTransformer_whenNoParameters() {
-        // Arrange
-        JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
-        String format = "prettify";
-        String[] filterParameter = {};
-        String[] filterOnlyParameter = {};
-
-        // Act
-        JSONTransformer result = builder.getDecorator(format, filterParameter, filterOnlyParameter);
-
-        // Assert
-        assertFalse(result instanceof BasicJsonTransformer);
-    }
 
     @Test
-    void getDecorator_shouldReturnMinifyDecorator_whenFormatIsMinify() {
+    void test_getDecorator_shouldReturnBasicJsonTransformer_whenNoParameters() throws IOException {
         // Arrange
         JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
         String format = "minify";
@@ -35,14 +25,16 @@ class JsonDecoratorBuilderTest {
         String[] filterOnlyParameter = {};
 
         // Act
-        JSONTransformer result = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
 
         // Assert
-        assertTrue(result instanceof MinifyDecorator);
+        assertTrue(transformer instanceof JSONTransformer);
+        assertEquals("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}",
+                     transformer.decorate("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}"));
     }
 
     @Test
-    void getDecorator_shouldReturnPrettifyDecorator_whenFormatIsPrettify() {
+    void test_getDecorator_shouldReturnMinifyDecorator_whenFormatIsPrettify() throws IOException {
         // Arrange
         JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
         String format = "prettify";
@@ -50,39 +42,66 @@ class JsonDecoratorBuilderTest {
         String[] filterOnlyParameter = {};
 
         // Act
-        JSONTransformer result = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
 
         // Assert
-        assertTrue(result instanceof PrettifyDecorator);
+        assertTrue(transformer instanceof JSONTransformer);
+        assertEquals("{\r\n" +
+                        "  \"json1\" : {\r\n" +
+                        "    \"id\" : 999\r\n" +
+                        "  }\r\n" +
+                        "}",
+                transformer.decorate("{\"json1\":{\"id\":999}}"));
     }
 
     @Test
-    void getDecorator_shouldReturnFilteredDecorator_whenFilterParametersPresent() {
+    void test_getDecorator_shouldReturnErrorWhenWrongJson() throws IOException {
         // Arrange
         JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
-        String format = "prettify";
-        String[] filterParameter = {"param1"};
+        String format = "minify";
+        String[] filterParameter = {};
         String[] filterOnlyParameter = {};
 
         // Act
-        JSONTransformer result = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
 
         // Assert
-        assertFalses(result instanceof Filter);
+        assertTrue(transformer instanceof JSONTransformer);
+        assertEquals("Invalid json",
+                transformer.decorate("{\"json1\":{\"id\""));
     }
 
     @Test
-    void getDecorator_shouldReturnFilterOnlyDecorator_whenFilterOnlyParametersPresent() {
+    void test_getDecorator_shouldReturnFilteredDecorator_whenFilterParametersPresent() throws IOException {
         // Arrange
         JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
-        String format = "prettify";
-        String[] filterParameter = {};
-        String[] filterOnlyParameter = {"param1", "param2"};
+        String format = "minify";
+        String[] filterParameter = {"value"};
+        String[] filterOnlyParameter = {};
 
         // Act
-        JSONTransformer result = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
 
         // Assert
-        assertFalse(result instanceof FilterOnly);
+        assertTrue(transformer instanceof JSONTransformer);
+        assertEquals("{\"json1\":{\"id\":999},\"json2\":{\"id\":999}}",
+                transformer.decorate("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}"));
+    }
+
+    @Test
+    void test_getDecorator_shouldReturnFilterOnlyDecorator_whenFilterOnlyParametersPresent() throws IOException {
+        // Arrange
+        JsonDecoratorBuilder builder = new JsonDecoratorBuilder();
+        String format = "minify";
+        String[] filterParameter = {};
+        String[] filterOnlyParameter = {"id"};
+
+        // Act
+        JSONTransformer transformer = builder.getDecorator(format, filterParameter, filterOnlyParameter);
+
+        // Assert
+        assertTrue(transformer instanceof JSONTransformer);
+        assertEquals("{\"json1\":{\"id\":999},\"json2\":{\"id\":999}}",
+                transformer.decorate("{\"json1\":{\"id\":999,\"value\":\"content\"},\"json2\":{\"id\":999}}"));
     }
 }

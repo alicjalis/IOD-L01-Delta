@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+
 /**
  * Klasa MinifyDecorator służy do minifikacji jsona
  */
@@ -24,7 +26,7 @@ public class MinifyDecorator extends JsonDecorator {
      * @param jsonString json do zminifikowania
      * @return Zwraca zminifikowanego jsona
      */
-    public String decorate(String jsonString)  {
+    public String decorate(String jsonString) throws IOException {
         return minify(super.decorate(jsonString));
     }
 

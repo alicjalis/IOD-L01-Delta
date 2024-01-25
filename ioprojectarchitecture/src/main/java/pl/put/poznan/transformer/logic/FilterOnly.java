@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -31,7 +32,7 @@ public class FilterOnly extends JsonDecorator {
      * @param text json do filtrowania
      * @return Zwraca json z polami z tylko podanymi kluczami
      */
-    public String decorate(String text) {
+    public String decorate(String text) throws IOException {
         return filterOutString(super.decorate(text));
     }
 

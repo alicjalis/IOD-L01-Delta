@@ -1,11 +1,15 @@
 package pl.put.poznan.transformer.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 import pl.put.poznan.transformer.logic.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+
+import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
@@ -20,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/transformer")
 public class TransformerController {
-    private final JsonDecoratorBuilder builder;
+    private JsonDecoratorBuilder builder;
 
     /**
      * Repozytorium do przechowywania JSONów.
@@ -40,25 +44,24 @@ public class TransformerController {
     }
 
 
-    /**
-     * Wrapper do rozpakowania jsonow do porównania w funkcji compare
-     */
-    public class RequestWrapper {
-        public String json1;
-        public String json2;
-    }
 
     /**
      * Porównuje dwa JSONy i zwraca różnice pomiędzy nimi.
      *
-     * @param requestBody JSONy do porównania zapakowane w strukture RequestWrapper
+     * @param objectNode JSONy do porównania zapakowane w strukture {"json1":{jsonToBecompared},"json2":{jsonToBecompared2}}
      * @return różnice między dwoma JSONami
      */
     @PostMapping("/compare/")
-    public String compare(@RequestBody RequestWrapper requestBody) {
-        logger.debug("Compare POST - json: "+requestBody);
-        JSONTransformer transform = new JsonComparator(new JsonDecorator( new BasicJsonTransformer()),requestBody.json1);
-        return transform.decorate(requestBody.json2);
+    public String compare(@RequestBody ObjectNode objectNode) {
+        try {
+            String s1 = new ObjectMapper().writeValueAsString(objectNode.get("json1"));
+            String s2 = new ObjectMapper().writeValueAsString(objectNode.get("json2"));
+            logger.debug("Compare POST - json: "+s1+" "+s2);
+            JSONTransformer transform = new JsonComparator(new JsonDecorator( new BasicJsonTransformer()),s1);
+            return transform.decorate(s2);
+        } catch (Exception e) {
+            return "Wrong input";
+        }
     }
 
     /**
@@ -77,7 +80,11 @@ public class TransformerController {
         logger.debug("Filter POST - json: "+text);
 
         JSONTransformer transform = builder.getDecorator(format,filterParameter, filterOnlyParameter);
-        return transform.decorate(text);
+        try {
+            return transform.decorate(text);
+        } catch (Exception e) {
+            return "Wrong input";
+        }
     }
 
 
@@ -94,7 +101,7 @@ public class TransformerController {
     @PostMapping("/insert")
     public String insert(@RequestBody String text, @RequestParam(value="format", defaultValue="minify") String format,
                          @RequestParam(value="field", defaultValue="") String field,
-                         @RequestParam(value="value", defaultValue="") String value) {
+                         @RequestParam(value="value", defaultValue="") String value) throws IOException {
         logger.debug("Insert POST - json: "+text);
 
         JSONTransformer transformer = new JsonDecorator( new BasicJsonTransformer());
@@ -138,5 +145,14 @@ public class TransformerController {
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error processing JSON", e);
         }
+    }
+
+    /**
+     * Setter for JsonDecoratorBuilder builder.
+     *
+     * @param Builder JsonDecoratorBuilder
+     */
+    public void SetDecoratorBuilder(JsonDecoratorBuilder Builder) {
+        this.builder = Builder;
     }
 }

@@ -34,7 +34,7 @@ public class JsonComparator extends JsonDecorator {
      * @param text json do prównania
      * @return Zwraca różnicę pomiędzy podanym jsonem a jsonem podanym przy tworzeniu obiektu
      */
-    public String decorate(String text) {
+    public String decorate(String text) throws IOException {
         return compareAndDisplayDifferences(super.decorate(text),jsonToCompare);
     }
 

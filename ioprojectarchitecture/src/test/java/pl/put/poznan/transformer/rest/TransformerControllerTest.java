@@ -2,69 +2,78 @@ package pl.put.poznan.transformer.rest;
 
 import org.junit.jupiter.api.Test;
 
-// import static org.junit.jupiter.api.Assertions.*;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+
+import pl.put.poznan.transformer.logic.JSONTransformer;
+import pl.put.poznan.transformer.logic.JsonDecoratorBuilder;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 public class TransformerControllerTest {
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @Test
-//    public void testCompare() throws Exception {
-//        String json1 = "{\"name\":\"John\", \"age\":30}";
-//        String json2 = "{\"name\":\"John\", \"age\":31}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/transformer/compare")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(json1))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void testFilter() throws Exception {
-//        String text = "{\"name\":\"John\", \"age\":30}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/transformer/filter")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(text))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void testFilterOnly() throws Exception {
-//        String text = "{\"name\":\"John\", \"age\":30}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/transformer/filterOnly")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(text))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void testCreateJSON() throws Exception {
-//        String jsonString = "{\"name\":\"John\", \"age\":30}";
-//        mockMvc.perform(MockMvcRequestBuilders.post("/transformer/json")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(jsonString))
-//                .andExpect(status().isOk());
-//    }
-//
-//    @Test
-//    public void testGetJSON() throws Exception {
-//        String jsonString = "{\"name\":\"John\", \"age\":30}";
-//        String id = "testId";
-//        // niedokonczone
-//        mockMvc.perform(MockMvcRequestBuilders.get("/transformer/json/" + id))
-//                .andExpect(status().isOk());
-//    }
+
+    @Test
+    public void testFilterBasicUsage() throws Exception {
+        TransformerController tc = new TransformerController();
+        String[] filter = {"msg2"};
+        String[] filter2 = {""};
+
+        JsonDecoratorBuilder mockBuilder = mock(JsonDecoratorBuilder.class);
+        JSONTransformer mockFilter = mock(JSONTransformer.class);
+        when(mockFilter.decorate("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}")).thenReturn("{\"msg\":\"hello\"}");
+        when(mockBuilder.getDecorator("minify",filter,filter2)).thenReturn(mockFilter);
+
+        tc.SetDecoratorBuilder(mockBuilder);
+
+        assertEquals("{\"msg\":\"hello\"}",tc.filter("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}","minify",filter,filter2));
+        verify(mockBuilder, times(1)).getDecorator("minify",filter,filter2);
+        verify(mockFilter, times(1)).decorate("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}");
+    }
+
+    @Test
+    public void testFilterOnlyBasicUsage() throws Exception {
+        TransformerController tc = new TransformerController();
+        String[] filter = {""};
+        String[] filter2 = {"msg2"};
+
+        JsonDecoratorBuilder mockBuilder = mock(JsonDecoratorBuilder.class);
+        JSONTransformer mockFilter = mock(JSONTransformer.class);
+        when(mockFilter.decorate("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}")).thenReturn("{\"msg2\":\"goodbye\"}");
+        when(mockBuilder.getDecorator("minify",filter,filter2)).thenReturn(mockFilter);
+
+        tc.SetDecoratorBuilder(mockBuilder);
+
+        assertEquals("{\"msg2\":\"goodbye\"}",tc.filter("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}","minify",filter,filter2));
+        verify(mockBuilder, times(1)).getDecorator("minify",filter,filter2);
+        verify(mockFilter, times(1)).decorate("{\"msg\":\"hello\",\"msg2\":\"goodbye\"}");
+    }
+
+
+    @Test
+    public void testFilterBasicUsagePrettify() throws Exception {
+        TransformerController tc = new TransformerController();
+        String[] filter = {""};
+
+        JsonDecoratorBuilder mockBuilder = mock(JsonDecoratorBuilder.class);
+        JSONTransformer mockPrettify = mock(JSONTransformer.class);
+        when(mockPrettify.decorate("{\"json1\":{\"id\":999}}")).thenReturn( "{\r\n" +
+                                                                                                        "  \"json1\" : {\r\n" +
+                                                                                                        "    \"id\" : 999\r\n" +
+                                                                                                        "  }\r\n" +
+                                                                                                        "}"
+        );
+        when(mockBuilder.getDecorator("prettify",filter,filter)).thenReturn(mockPrettify);
+        tc.SetDecoratorBuilder(mockBuilder);
+
+        assertEquals(  "{\r\n" +
+                                "  \"json1\" : {\r\n" +
+                                "    \"id\" : 999\r\n" +
+                                "  }\r\n" +
+                                "}"
+                ,tc.filter("{\"json1\":{\"id\":999}}","prettify",filter,filter));
+        verify(mockBuilder, times(1)).getDecorator("prettify",filter,filter);
+        verify(mockPrettify, times(1)).decorate("{\"json1\":{\"id\":999}}");
+    }
+
 }
-
-
-
-
