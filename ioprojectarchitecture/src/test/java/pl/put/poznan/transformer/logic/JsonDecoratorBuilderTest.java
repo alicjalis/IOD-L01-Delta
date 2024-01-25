@@ -47,10 +47,10 @@ class JsonDecoratorBuilderTest {
         // Assert
         assertTrue(transformer instanceof JSONTransformer);
         assertEquals("{\r\n" +
-                        "  \"json1\" : {\r\n" +
-                        "    \"id\" : 999\r\n" +
-                        "  }\r\n" +
-                        "}",
+                              "  \"json1\" : {\r\n" +
+                              "    \"id\" : 999\r\n" +
+                              "  }\r\n" +
+                              "}",
                 transformer.decorate("{\"json1\":{\"id\":999}}"));
     }
 
