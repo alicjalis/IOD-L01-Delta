@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,7 +24,7 @@ public class FieldInserter extends JsonDecorator {
         value = Value;
     }
 
-    public String decorate(String text)  {
+    public String decorate(String text) throws IOException {
         return addField(super.decorate(text));
     }
 

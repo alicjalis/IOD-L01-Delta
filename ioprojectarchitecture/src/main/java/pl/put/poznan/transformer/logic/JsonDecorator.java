@@ -1,5 +1,7 @@
 package pl.put.poznan.transformer.logic;
 
+import java.io.IOException;
+
 /**
  * Klasa JsonDecorator implementuje interfejs JSONTransformer.
  * Służy do dekorowania obiektów implementujących ten sam interfejs, dodając do nich dodatkowe funkcje.
@@ -26,7 +28,7 @@ public class JsonDecorator implements JSONTransformer {
      * @return Zwraca dekorowany ciąg JSON.
      */
     @Override
-    public String decorate(String JsonString) {
+    public String decorate(String JsonString) throws IOException {
         return transformer.decorate(JsonString);
     }
 }

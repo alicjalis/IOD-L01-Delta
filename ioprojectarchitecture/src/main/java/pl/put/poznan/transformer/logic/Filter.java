@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -34,7 +35,11 @@ public class Filter extends JsonDecorator  {
      * @return Zwraca json bez pól z podanych kluczy
      */
     public String decorate(String text)  {
-        return filterString(super.decorate(text));
+        try {
+            return filterString(super.decorate(text));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -44,7 +49,7 @@ public class Filter extends JsonDecorator  {
      * @param text Tekst do filtrowania.
      * @return Zwraca przefiltrowany tekst.
      */
-    private String filterString(String text)  {
+    private String filterString(String text) throws IOException {
         JSON jsNode = new JSON(text);
 
         ArrayList<JsonNode> toBeRemovedField = new ArrayList<>();

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+
 public class PrettifyDecorator extends JsonDecorator{
     public PrettifyDecorator(JSONTransformer json) {
         super(json);
     }
 
-    public String decorate(String jsonString)  {
+    public String decorate(String jsonString) throws IOException {
         return prettify(super.decorate(jsonString));
     }
 
